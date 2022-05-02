@@ -214,6 +214,20 @@ inline RSDecoderResult DecoderRS16<T_Point>::decodeDifopPkt(const uint8_t* pkt)
   {
     return RSDecoderResult::WRONG_PKT_HEADER;
   }
+
+  // check for PPS UTC synchronisation
+  if (dpkt_ptr->diagno.gps_status & 1) {
+    printf("Warning: PPS lock is invalid!\n");
+  }
+  if (dpkt_ptr->diagno.gps_status & 2) {
+    printf("Warning: GPRMC is invalid!\n");
+  }
+  if ((dpkt_ptr->diagno.gps_status & 4) == 0) {
+    printf("Warning: LiDAR internal timestamp is not synchronizing the UTC!\n");
+  } else {
+    printf("LiDAR internal timestamp is synchronizing UTC!\n");
+  }
+
   this->template decodeDifopCommon<RS16DifopPkt>(pkt, LidarType::RS16);
   if (!this->difop_flag_)
   {
